@@ -5,6 +5,8 @@ const router = express.Router();
 const {
   createProduct,
   getProducts,
+  updateProduct,
+  deleteProduct,
 } = require("../controllers/productController");
 
 // middleware
@@ -23,6 +25,12 @@ router.get("/", getProducts);
 
 // Admin — create product
 router.post("/create", protect, adminOnly, createProduct);
+
+// Admin — update product
+router.put("/:id", protect, adminOnly, updateProduct);
+
+// Admin — delete product
+router.delete("/:id", protect, adminOnly, deleteProduct);
 
 
 module.exports = router;

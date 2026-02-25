@@ -5,16 +5,16 @@ export default function Cart() {
   const [cart, setCart] = useState(null);
 
   const loadCart = async () => {
-    const res = await api.get("/cart");
+    const res = await api.get("/api/cart");
     setCart(res.data);
   };
 
   const removeItem = async (id) => {
-    await api.delete(`/cart/remove/${id}`);
+    await api.delete(`/api/cart/remove/${id}`);
     loadCart();
   };
   const checkout = async () => {
-    const res = await api.post("/orders/checkout", {
+    const res = await api.post("/api/orders/checkout", {
       paymentMethod: "UPI"
     });
 
@@ -23,7 +23,7 @@ export default function Cart() {
     loadCart();
   };
   const payNow = async () => {
-  const { data } = await api.post("/payment/create-order", {
+  const { data } = await api.post("/api/payment/create-order", {
     amount: total,
   });
 
@@ -35,7 +35,7 @@ export default function Cart() {
     name: "Nishant Kirana Store",
 
     handler: async function (response) {
-      await api.post("/payment/verify", response);
+      await api.post("/api/payment/verify", response);
       alert("Payment Success ✅");
     },
   };
@@ -56,33 +56,45 @@ export default function Cart() {
       0
     ) || 0;
 
-  if (!cart) return <p>Loading...</p>;
+  if (!cart) return <p className="loading">Loading cart...</p>;
 
   return (
-    <div>
+    <div className="container">
       <h2>My Cart</h2>
 
-      {cart.items.map((item) => (
-        <div key={item.product._id}
-             style={{ border: "1px solid #ccc", margin: 10, padding: 10 }}>
-          <h4>{item.product.title}</h4>
-          <p>₹ {item.product.price}</p>
-          <p>Qty: {item.quantity}</p>
+      {cart.items && cart.items.length > 0 ? (
+        <>
+          <div className="cart-items">
+            {cart.items.map((item) => (
+              <div key={item.product._id} className="cart-item">
+                <div className="cart-item-info">
+                  <h4>{item.product.title}</h4>
+                  <p>₹ {item.product.price}</p>
+                  <p>Qty: {item.quantity}</p>
+                </div>
+                <button onClick={() => removeItem(item.product._id)}>
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
 
-          <button onClick={() => removeItem(item.product._id)}>
-            Remove
-          </button>
-          
-        </div>
-      ))}
+          <div className="cart-total">
+            Total: ₹ {total}
+          </div>
 
-      <h3>Total: ₹ {total}</h3>
-     <button onClick={checkout}>
-        Checkout
-      </button>
-      <button onClick={payNow}>
-       Pay with UPI 💳
-</button>
+          <div className="checkout-section">
+            <button onClick={checkout}>
+              Checkout
+            </button>
+            <button onClick={payNow}>
+             Pay with UPI 💳
+            </button>
+          </div>
+        </>
+      ) : (
+        <p className="empty-cart">Your cart is empty</p>
+      )}
     </div>
   );
 }
