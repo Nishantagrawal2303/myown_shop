@@ -12,6 +12,7 @@ const {
 // middleware
 const { protect } = require("../middleware/authMiddleware");
 const { adminOnly } = require("../middleware/adminMiddleware");
+const { upload } = require("../utils/cloudinary");
 
 
 /*
@@ -24,10 +25,10 @@ PRODUCT ROUTES
 router.get("/", getProducts);
 
 // Admin — create product
-router.post("/create", protect, adminOnly, createProduct);
+router.post("/create", protect, adminOnly, upload.single("image"), createProduct);
 
 // Admin — update product
-router.put("/:id", protect, adminOnly, updateProduct);
+router.put("/:id", protect, adminOnly, upload.single("image"), updateProduct);
 
 // Admin — delete product
 router.delete("/:id", protect, adminOnly, deleteProduct);

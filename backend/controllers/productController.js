@@ -3,6 +3,10 @@ const Product = require("../models/Product");
 // ADD PRODUCT (Admin only)
 exports.createProduct = async (req, res) => {
   try {
+    // If an image was uploaded, assign its path (Cloudinary URL) to req.body.image
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
     const product = await Product.create(req.body);
 
     res.status(201).json({
@@ -30,6 +34,10 @@ exports.getProducts = async (req, res) => {
 // UPDATE PRODUCT (Admin only)
 exports.updateProduct = async (req, res) => {
   try {
+    // If an image was uploaded, update req.body.image
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,

@@ -15,6 +15,7 @@ export default function Admin() {
     description: "",
     stock: 1,
   });
+  const [image, setImage] = useState(null);
 
   // ✅ Redirect non-admins to home
   useEffect(() => {
@@ -31,10 +32,27 @@ export default function Admin() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/api/products/create", formData);
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("price", formData.price);
+      data.append("category", formData.category);
+      data.append("description", formData.description);
+      data.append("stock", formData.stock);
+      if (image) {
+        data.append("image", image);
+      }
+
+      await api.post("/api/products/create", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       alert("Product added successfully! ✅");
       setFormData({
         title: "",
@@ -43,6 +61,8 @@ export default function Admin() {
         description: "",
         stock: 1,
       });
+      setImage(null);
+      // Reset file input manually if needed, or by keying the input
     } catch (error) {
       alert(error.response?.data?.message || "Error adding product");
     }
@@ -97,6 +117,14 @@ export default function Admin() {
             name="stock"
             value={formData.stock}
             onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Product Image:</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
           />
         </div>
         <button type="submit">Add Product</button>
